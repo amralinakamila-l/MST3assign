@@ -11,7 +11,6 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         try {
-            // ✅ 1. Чтение входных данных
             Gson gson = new Gson();
             FileReader reader = new FileReader("data/input.json"); // или "data/input.json" если в папке data
             InputData inputData = gson.fromJson(reader, InputData.class);
@@ -19,7 +18,6 @@ public class Main {
 
             List<ResultData> results = new ArrayList<>();
 
-            // ✅ 2. Обработка каждого графа
             for (GraphData graph : inputData.graphs) {
                 ResultData result = new ResultData();
                 result.graph_id = graph.id;
@@ -31,18 +29,15 @@ public class Main {
                 results.add(result);
             }
 
-            // ✅ 3. Подготовка выходного объекта
             Map<String, Object> output = new HashMap<>();
             output.put("results", results);
 
-            // ✅ 4. Настройка Gson — чтобы числа были как 3.0, 16.0, а не 3, 16
             Gson prettyGson = new GsonBuilder()
                     .setPrettyPrinting()
                     .serializeSpecialFloatingPointValues()
                     .setObjectToNumberStrategy(ToNumberPolicy.DOUBLE)
                     .create();
 
-            // ✅ 5. Запись в файл
             FileWriter writer = new FileWriter("data/output.json");
             prettyGson.toJson(output, writer);
             writer.close();
