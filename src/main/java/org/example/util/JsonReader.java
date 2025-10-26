@@ -1,44 +1,19 @@
 package org.example.util;
-/// лщаошполкопок
-import com.google.gson.*;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import org.example.model.*;
+import org.example.model.GraphData;
 
 import java.io.FileReader;
-import java.lang.reflect.Type;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
 
 public class JsonReader {
-    public static List<Graph> loadGraphs(String filePath) {
-        try (FileReader reader = new FileReader(filePath)) {
-            JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
-            JsonArray graphsArray = jsonObject.getAsJsonArray("graphs");
-
-            List<Graph> graphs = new ArrayList<>();
-            for (JsonElement graphEl : graphsArray) {
-                JsonObject g = graphEl.getAsJsonObject();
-                int id = g.get("id").getAsInt();
-
-                List<String> nodes = new Gson().fromJson(g.get("nodes"),
-                        new TypeToken<List<String>>(){}.getType());
-
-                List<Edge> edges = new ArrayList<>();
-                for (JsonElement e : g.getAsJsonArray("edges")) {
-                    JsonObject eo = e.getAsJsonObject();
-                    edges.add(new Edge(
-                            eo.get("from").getAsString(),
-                            eo.get("to").getAsString(),
-                            eo.get("weight").getAsInt()
-                    ));
-                }
-
-                graphs.add(new Graph(id, nodes, edges));
-            }
-            return graphs;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
+    public static List<GraphData> readGraphs(String filePath) throws IOException {
+        Gson gson = new Gson();
+        JsonObject jsonObject = gson.fromJson(new FileReader(filePath), JsonObject.class);
+        return gson.fromJson(jsonObject.getAsJsonArray("graphs"), new TypeToken<List<GraphData>>() {}.getType());
     }
 }
 

@@ -3,6 +3,7 @@
     {
       "id": 1,
       "nodes": ["A", "B", "C", "D", "E"],
+      "edges_count": 7,
       "edges": [
         {"from": "A", "to": "B", "weight": 4},
         {"from": "A", "to": "C", "weight": 3},
@@ -16,6 +17,7 @@
     {
       "id": 2,
       "nodes": ["A", "B", "C", "D"],
+      "edges_count": 5,
       "edges": [
         {"from": "A", "to": "B", "weight": 1},
         {"from": "A", "to": "C", "weight": 4},

@@ -21,6 +21,14 @@
             <version>2.10.1</version>
         </dependency>
 
-    </dependencies>>
+        <dependency>
+            <groupId>edu</groupId>
+            <artifactId>algs4</artifactId>
+            <version>1</version>
+            <scope>compile</scope>
+        </dependency>
+
+
+    </dependencies>
 
 </project>
