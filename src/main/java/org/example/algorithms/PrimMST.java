@@ -46,7 +46,6 @@ public class PrimMST {
         result.total_cost = totalCost;
         result.operations_count = operations;
         result.execution_time_ms = (end - start) / 1_000_000.0;
-
         return result;
     }
 }

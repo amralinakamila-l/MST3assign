@@ -15,7 +15,6 @@ public class GraphGenerator {
         Random rand = new Random();
         List<GraphData> graphs = new ArrayList<>();
 
-        // Generate graphs by category
         generateGraphs(graphs, 5, 5, 30, rand);       // small
         generateGraphs(graphs, 10, 30, 300, rand);    // medium
         generateGraphs(graphs, 10, 300, 1000, rand);  // large
@@ -41,11 +40,9 @@ public class GraphGenerator {
             int vertexCount = rand.nextInt(maxV - minV + 1) + minV;
             g.nodes = generateLetterNodes(vertexCount);
 
-            // Формируем список рёбер
             Set<String> uniqueEdges = new HashSet<>();
             g.edges = new ArrayList<>();
 
-            // Количество рёбер ограничиваем (до ~2x вершин)
             int edgeCount = Math.min(vertexCount * 2, 1000 + vertexCount / 2);
 
             while (g.edges.size() < edgeCount) {
@@ -64,12 +61,11 @@ public class GraphGenerator {
                 }
             }
 
-            g.edges_count = g.edges.size(); // ✅ добавляем поле, как в твоём старом JSON
+            g.edges_count = g.edges.size();
             graphs.add(g);
         }
     }
 
-    // Генератор буквенных имён узлов (A, B, C ... Z, AA, AB ...)
     private static List<String> generateLetterNodes(int count) {
         List<String> nodes = new ArrayList<>();
         for (int i = 0; i < count; i++) {
