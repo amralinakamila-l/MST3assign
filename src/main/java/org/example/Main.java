@@ -1,8 +1,11 @@
 package org.example;
 
+import org.example.visualization.GraphVisualizer;
 import com.google.gson.*;
 import com.google.gson.ToNumberPolicy;
 import org.example.algorithms.*;
+import org.example.graph.Graph;
+import org.example.graph.GraphLoader;
 import org.example.model.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -12,6 +15,79 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
+        List<Graph> graphs = GraphLoader.getAllExperimentalGraphs();
+        System.out.println("Loaded graphs: " + graphs.size());
+        GraphVisualizer.createAllGraphImages(graphs);
+    }
+
+
+    private static void generateGraphImages() {
+        try {
+            System.out.println("\n=== Generating graph images ===");
+
+            List<Graph> graphs = GraphLoader.getAllExperimentalGraphs();
+            GraphVisualizer.createAllGraphImages(graphs);
+
+            System.out.println("✅ All graph images generated!");
+
+        } catch (Exception e) {
+            System.err.println("Error while generating images: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private static void runWithGraphClasses() {
+        try {
+            List<Graph> graphs = GraphLoader.getAllExperimentalGraphs();
+            List<ResultData> results = new ArrayList<>();
+
+            for (Graph graph : graphs) {
+                System.out.println("=== Processing Graph " + graph.getGraphId() + " ===");
+                System.out.println(graph);
+
+                ResultData result = new ResultData();
+                result.graph_id = graph.getGraphId();
+                result.input_stats = new InputStats(
+                        graph.getVerticesCount(),
+                        graph.getEdges().size()
+                );
+
+                long startTime = System.nanoTime();
+                MSTResult primResult = PrimMST.findMST(graph);
+                long endTime = System.nanoTime();
+
+                result.prim = new AlgorithmResult();
+                result.prim.total_cost = primResult.getTotalCost();
+                result.prim.operations_count = primResult.getOperationsCount();
+                result.prim.execution_time_ms = (endTime - startTime) / 1_000_000.0;
+
+                startTime = System.nanoTime();
+                MSTResult kruskalResult = KruskalMST.findMST(graph);
+                endTime = System.nanoTime();
+
+                result.kruskal = new AlgorithmResult();
+                result.kruskal.total_cost = kruskalResult.getTotalCost();
+                result.kruskal.operations_count = kruskalResult.getOperationsCount();
+                result.kruskal.execution_time_ms = (endTime - startTime) / 1_000_000.0;
+
+                results.add(result);
+
+                System.out.printf("Prim: cost=%.2f, operations=%d, time=%.3fms\n",
+                        result.prim.total_cost, result.prim.operations_count, result.prim.execution_time_ms);
+                System.out.printf("Kruskal: cost=%.2f, operations=%d, time=%.3fms\n",
+                        result.kruskal.total_cost, result.kruskal.operations_count, result.kruskal.execution_time_ms);
+                System.out.println();
+            }
+
+            generateReports(results);
+
+        } catch (Exception e) {
+            System.err.println("Error while running MST algorithms: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private static void runWithJsonData() {
         try {
             Gson gson = new Gson();
             FileReader reader = new FileReader("data/input.json");
@@ -31,6 +107,16 @@ public class Main {
                 results.add(result);
             }
 
+            generateReports(results);
+
+        } catch (Exception e) {
+            System.err.println("Error while processing JSON data: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private static void generateReports(List<ResultData> results) {
+        try {
             Map<String, Object> output = new HashMap<>();
             output.put("results", results);
 
@@ -50,6 +136,7 @@ public class Main {
             generateExcelReport(results, "data/summary.xlsx");
 
         } catch (Exception e) {
+            System.err.println("Error while generating reports: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -96,7 +183,6 @@ public class Main {
 
             int rowNum = 1;
             for (ResultData result : results) {
-                // Prim
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(result.graph_id);
                 row.createCell(1).setCellValue("Prim");
@@ -106,7 +192,6 @@ public class Main {
                 row.createCell(5).setCellValue(result.prim.operations_count);
                 row.createCell(6).setCellValue(result.prim.execution_time_ms);
 
-                // Kruskal
                 row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(result.graph_id);
                 row.createCell(1).setCellValue("Kruskal");
@@ -132,6 +217,7 @@ public class Main {
         }
     }
 }
+
 
 
 
